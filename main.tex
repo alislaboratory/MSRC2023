@@ -1,0 +1,531 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage{adjustbox}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{marginnote}
+\usepackage{natbib}
+
+% Set up page format
+\usepackage[margin=1in]{geometry}
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0em}
+
+% Title, author, and date
+\title{The Mathematical Analysis of Random Walk Systems}
+\author{Ali Ashrafy, Benoy Drenzla, Tom Prickett \\ St Columba Anglican School}
+\date{\today}
+
+% Begin document
+\begin{document}
+
+% Title and author
+\maketitle
+
+% Abstract
+\begin{abstract}
+The University of Melbourne Mathematics and Statistics Research Competition (MSRC) involves working through a preset series of problems, numbered 1 through 15. This report presents a solution and further elaboration on the 15th problem.
+\end{abstract}
+
+\section{Problem 15}
+Problem 15 requires us to investigate the movement of a spider on a two-dimensional integer lattice, initiating its journey from the origin, \(O\). The spider has an equal probability of \(0.25\) to move in each of the four cardinal directions: up, down, left, or right. We are particularly interested in determining the spider's escape time, \(T\), which represents the number of steps the spider takes to reach a predefined boundary curve, \(\Gamma\). This escape time, \(T\), is a random variable with positive integer values, and the probabilities give its distribution 
+\[
+\{\mathbb{P}(T=n) : n = 1, 2, 3, ...\}.
+\] 
+Our primary task is to calculate the expected escape time, \(\mathbb{E}[T]\):
+
+\begin{equation}
+    E(T) = \sum_{n=1}^{\infty} n \times P(T=n)
+\end{equation}
+
+which represents the average number of steps the spider would take to reach the boundary. This problem is conceptualised within the framework of random walks in probability theory, where an agent traverses through a grid based on random processes.
+
+\subsection{Problem 15 A}
+Problem 15 A, the primary task, is to compute the expected escape time of the spider for the figure below:
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.5]{Screenshot 2023-08-13 at 12.35.49 pm.png}
+    \caption{Boundary Curve $\Gamma$.}
+    \label{fig:MSRC1}
+\end{figure}
+
+\subsection{Problem 15 B}
+Given a fixed length for a boundary curve, how should you design a trap such that the spider's expected escape time from the starting point is:
+\begin{enumerate}
+    \item Maximized (it takes the spider the longest possible time to escape)?
+    \item Minimized (the spider escapes in the shortest possible time)?
+\end{enumerate}
+
+Essentially, problem 15 B is to give insights into shapes for $\Gamma$ that either prolong or shorten the spider's journey to escape.
+
+\subsection{Problem 15 C}
+Is it possible to construct two regions that are geometrically different (namely, they are not rotations/ reflections of each other) but induce the same expected escape time?
+
+\subsection{Problem 15 D}
+Does the distribution of the escape time uniquely define the shape of the trap?
+\begin{itemize}
+    \item If yes, can the boundary curve $\Gamma$ be determined solely from the distribution of T?
+\end{itemize}
+
+\section{Describing Random Walks}
+\subsection{Introduction to Random Walks}
+A random walk is one of the fundamental concepts in probability theory and statistical physics. In summary, a random walk is a sequence of steps determined by a random mechanism. In the context of our question, the spider's journey across the two-dimensional integer lattice can be conceptualized as a random walk. At every point in its path, the spider's next move — up, down, left, or right — has an equal probability of \(0.25\). 
+
+The two-dimensional lattice random walk, as represented by our spider's movements, is a classic example of a discrete-time stochastic (or random) process. Each step in the spider's journey corresponds to a random variable, resulting in a sequence of random variables that describe its path.
+
+Understanding the properties and behaviours of random walks is one way of analysing the expected escape time, \(T\), for the spider to reach the boundary curve, \(\Gamma\). In this report, we investigate the relationship between the spider's escape time and the parameters of the boundary; including size and shape.
+
+By delving deep into the nature of random walks, we aim to gain insights into the spider's average time to escape, \(\mathbb{E}[T]\), and the probabilistic dynamics governing its journey.
+
+\subsection{Markov Chains}
+
+To understand the spider's movements and calculate the time to escape, \(\mathbb{E}[T]\), Markov chains are used. Markov Chains are mathematical concepts that not only have many applications in statistics, biology, economics, and physics but also enable an understanding of stochastic processes. They have been shown to describe the probabilities of tending towards certain states given the initial position.
+
+Let's see an example of the use-case of a Markov Chain.
+Take a very simple example of the weather; it can exist in 2 states: sunny, or rainy, and can transition between these with determined probabilities. This behaviour can be illustrated using a graph where each node represents the state the weather can be in, that is, sunny or rainy, and the arrows represent the probability of moving from one state to another. 
+
+Note that a node can also link to itself, represented by a circular arrow leading to itself.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.5]{MC1.png}
+    \caption{An example of a Markov chain diagram.}
+    \label{fig:MSRC1}
+\end{figure}
+
+The transition probabilities must adhere to two important properties:
+
+\begin{itemize}
+    \item The Markov Property: The future state depends only on the current state and not on the sequence of states that preceded it.
+    \item The sum of probabilities of outgoing transitions from any state is always 1, ensuring a valid probability distribution.
+\end{itemize}
+
+\subsubsection{Transition Matrices}
+
+An efficient way to represent Markov chains is through a transition matrix ($A$) where each element denotes the transition probability from one state (the rows) to another (the columns). Given a starting state, multiplying by the transition matrix gives the probability of moving from one state to the next. Doing this iteratively gives the probability of moving from the initial position (the rows) to the final state (the columns).
+
+Formally, for a higher order transition matrix, when calculating for an $n$ amount of steps, you multiply the transition matrix by itself an $n$ amount of times. 
+
+Thus, we can find the probability of being at a certain state by iterating the transition matrix $A$ by the number of steps $n$ we find the probability of going from a state ($i$) to a second state ($j$), which can be expressed as the term \(A_{i,j}\) which is a matrix with $i$ rows and $j$ columns. Take the previous example of the weather. Given that there are two states, it's possible to say that the transition matrix will have two potential initial states, and two potential final states, the resulting matrix will therefore be $2 \times 2$. By assuming that the state $1$ is sunny, and state $2$ is raining, we can represent these states as the numerical equivalent in rows and columns. That is, the first row is the \textit{sunny} state and the second row is the \textit{raining} state. Similarly, the first column is the \textit{sunny} state and the second column is the \textit{raining} state. Hence we can create a transition matrix based on Figure 2:
+
+\begin{equation*}
+P(d) =  \begin{bmatrix}
+    0.8 & 0.2\\
+    0.7 & 0.3\\
+\end{bmatrix}
+\end{equation*}
+
+And by multiplying the matrix by itself $d$ amount of times (where $d$ is the number of days) we can calculate the probabilities of it being in state 1, or state 2 after $d$ days:
+
+\begin{equation*}
+P(d) =  \begin{bmatrix}
+    0.8 & 0.2\\
+    0.7 & 0.3\\
+\end{bmatrix}^d
+\end{equation*}
+
+We can thus represent the probability of going from an initial state $i$ to the final state $j$ over a period of n steps by the expression:
+
+\begin{equation*}
+    P(n) = A^n
+\end{equation*}
+
+Which can be expanded as:
+
+\begin{equation*}
+P(n) =  \begin{bmatrix}
+    P_{1,1} & P_{1,2} & \cdots & P_{1,j} \\
+    P_{2,1} & P_{2,2} & \cdots & P_{2,j} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    P_{i,1} & P_{i,2} & \cdots & P_{i,j} \\
+\end{bmatrix}^n
+\end{equation*}
+
+\subsection{Application of Markov Chains in Random Walks}
+The random walk, as described earlier, possesses the Markov property: the next state in the sequence (or the next step in the walk) is dependent solely on the current state and not on the sequence of events leading up to it. Hence, it is a prime candidate for representation as a Markov chain.
+
+A random walk's transition matrix effectively captures the probabilities of moving from one state to another. For our two-dimensional spider scenario, the transition matrix would indicate the probabilities of moving up, down, left, or right from any given position. As time progresses and the spider makes more steps, the probabilities evolve and change according to the transition matrix.
+
+One aspect of understanding random walks via Markov chains is the concept of 'null states'. In our spider scenario, the boundary curve, \(\Gamma\), can be thought of as a \textit{null state}. Once the spider reaches any of these points, it won't return to the inner lattice. It's at the end of its journey. Mathematically, a null state in a Markov chain is a state that, once entered, cannot be left, and does not affect any probabilities of any other state as the number of iterations increases. Thus each of the coordinates of the boundary curve, $\Gamma$, will have a total probability of moving from the state, or to itself, as zero. 
+
+Analysing the spider's random walk, considering the null boundary, will give insights into the expected time to a null state or, in the spider's case, the escape time. Understanding this expected time is vital for solving our primary problem.
+
+Lastly, by leveraging Markov chains, we can answer several intriguing questions about the spider's journey, such as:
+\begin{itemize}
+    \item What are the probabilities of the spider being at different positions after a certain number of steps?
+    \item Which paths are most likely for the spider to take on its way to the boundary?
+    \item How do these probabilities and paths change based on the spider's starting position within the lattice?
+    \item By investigating the probability distribution of the spider solely, can we make any inferences regarding the starting position of the spider and the size and shape of the boundary?
+\end{itemize}
+
+\subsubsection{Markov Chains to Solve Problem 15 A}
+
+By using the Markov chains and transition matrix properties to answer question 15 we can calculate the expected number of steps to escape through the use of the formula given. The boundary points are known and can therefore be labelled from $1 \leftarrow 111$, accounting for all of the points in the enclosed space of the boundary curve. Thus we need a transition matrix which is $111 \times 111$. 
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\linewidth]{Sketch-2.jpg}
+    \caption{Boundary curve with labelled points.}
+    \label{fig:poin1-1}
+  \end{minipage}
+  \hspace{0.05\textwidth}
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\linewidth]{Sketch-3.jpg}
+    \caption{Transition matrix with rows and columns representing the total $111$ initial states at which the spider can be $i$ (the rows) and the $111$ final states at which the spider can be $j$ (columns).}
+    \label{fig:poin2-1}
+  \end{minipage}
+\end{figure}
+
+\begin{equation*}
+    \mathbb{E}(T) = \sum_{n=1}^{\infty} n \times P(T=n)
+\end{equation*}
+
+Which can further be expanded as:
+
+\begin{equation}
+    \mathbb{E}(T) = \sum_{n=1}^{\infty} n \times (\sum_{m_{initial}}^{m_{final}} \times A_{i, j}^n)
+\end{equation}
+
+Where $i$ is the original coordinate (represented by the $i$-th row on the transition matrix) and $m_{initial} \rightarrow m_{final}$, are the points represented by the boundary curve. That is $A_{i, m}^n$ is the point in the transition matrix which represents the probability of starting at point $i$ and finishing at a point $m$ which is on the boundary curve. As we are starting the spider at coordinates ($6, 6$) or point $51$ we can visually represent by Figure 5.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.2]{Sketch-4 3.jpg}
+    \caption{Visual representation of the probability of being at the boundary point $m$ from the starting point $51$.}
+    \label{fig:MSRC1}
+\end{figure}
+
+Ideally, a stationary distribution or equilibrium state is reached when the product remains unchanged over iterations. This is because the probability of the same states occurring as the number of iterations moves towards infinity typically tends towards zero.
+
+Thus the expected number of steps to reach the boundary is represented by the sum of the probabilities of going from the original state ($O$) to the boundary coordinates multiplied by the number of iterations, or steps that the spider has taken, $n$, as $n \rightarrow \infty$. 
+
+\subsection{The Monte Carlo Method}
+The Monte Carlo method is a statistical technique that uses random sampling to solve problems that may be deterministic in nature.
+Although it is typically utilised in the evaluation of integrals, especially in high-dimensional spaces, optimisation and probability distribution, it can also be used for simulations.
+
+Consider the following example of a typical use-case of a Monte Carlo methodology to approach a problem:
+
+Suppose that you want to evaluate the integral of a function \(f(x)\) over the interval \([a,b]\).
+The steps to do so are as follows:
+
+\begin{enumerate}
+    \item Randomly sample points \(x_i\) in the given interval \([a,b]\).
+    \item Evaluate \(f(x_i)\) for each sampled point.
+    \item Taking the average of these evaluations will converge to \(f(x)\) over \([a,b]\). Multiplying this by the length of the interval will result in an estimate of the integral. 
+\end{enumerate}
+
+\subsection{Application of the Monte Carlo Method in Random Walks}
+Both the Markov Chains and Monte Carlo methods will be used in parallel to ensure the reliability of our results.
+
+The Monte Carlo approach describes a method for simulating a random walk over very large \(n\). It provides us with an estimate of the expected escape time for the given boundary to compare with the more analytical approach with Markov Chains (assuming our results for the simulation are correct). 
+
+Essentially, in each iteration up to an arbitrarily large \(n\), a random walk is simulated until the spider reaches the boundary. The sum is incremented by the steps taken which is then divided by the \(n\), the number of trials after all iterations are complete.
+
+\section{Solving Problem 15 A}
+
+Although it would be possible to calculate the expected value by hand multiplying the matrix, the computational complexities involved are large.
+
+Approaching this programmatically has made it possible to both simplify the time needed to calculate the probability and ensure greater accuracy in the results.
+
+The code is written in Python 3.10 and can be found in the appendices. There are 2 files, each of which use the different approaches; markov.py and montecarlo.py. Please note that markov.py will require an installation of the Python package Numpy for matrix multiplication. Further information can be found \href{https://phoenixnap.com/kb/install-numpy}{here}.
+
+\subsubsection{Logic and Methodology}
+\begin{enumerate}
+    \item \textbf{Transition Matrix Definition:} First we need to create a transition matrix (Represented in Figure 4), \(A\), which is set up for the spider's movements. For an interior point \(i\), \(A_{i,j}\) is \(0.25\) if \(j\) is one of the \textit{N, E, S, W} (not diagonal) neighbors of \(i\). Else the probability will be set to zero. Further, the boundary curves will be set to null states or escape states, and thus all probabilities within this will be zero. 
+    \item \textbf{Matrix Power Computation:} The \(n\)-th power of the matrix, \(A^n\), provides the probabilities of reaching each lattice point from any initial point after \(n\) steps (shown in Figure 5).
+    \item \textbf{Iterative Calculation:} An iterative approach is employed. Starting from the initial state, we sum the probabilities of being at each subsequent boundary point represented in the matrix (Shown in Equation 2 and Figure 5). Iterations will then stop when the probability of not escaping becomes negligible in 32-bit single-precision floating points (explained in more detail below). This will be our best estimate for the expected value.
+    \item \textbf{Expected Escape Time Calculation:} Using the recursive relationship, the expected time is calculated using the sum of going from the initial state $O$ denoted by the $i$-th row to the boundary curve points, denoted by the $j$-th column. By then substituting the number of iterations which have occurred (the number of steps the spider has taken) and the sum of the probabilities of being at the boundary and escaping, we can thus find $\mathbb{E}(T)$:
+    \[
+    E(T) = \sum_{n=1}^{\infty} n \times P(T=n)
+    \]
+    \item \textbf{Computational Approach:} Given the complexities of matrix operations, we created a program to manage the matrix powers, boundary adjustments, and the expected escape time.
+\end{enumerate}
+
+\subsection{Results for Problem 15 A}
+Thus by following the methodology as shown above, we can calculate the expected escape time for the given shape \(\Gamma\) which converges towards:
+
+\begin{equation*}
+    \mathbb{E}(T) = 7.520354455020274 \text{ steps}
+\end{equation*}
+
+\subsubsection{The Result}
+At the beginning of solving the problem, it was thought that the expected number of steps will be close to the shortest path to the furthest point on the boundary curve. In the case of Problem 15 A, this is $6$. As the final result was approximately $7.52$, the result is 20 percent off. There is no clearly observable relationship, however, it would be interesting to compare the results of expected time compared to the shortest path to the furthest point over multiple shapes.
+
+\subsubsection{Explanation of Result}
+This value is reached after exactly $n = 195$ iterations. It does not appear to change after this as the new values are too small to be tracked by the 32-bit single precision floating point numbers that Python and most other languages use as their default storage method for real numbers. If it interests you, you may read more about it \href{https://en.wikipedia.org/wiki/Single-precision_floating-point_format}{here}.
+
+We can verify this number by running a Monte Carlo simulation. With the given boundaries, the Monte Carlo method produces:
+\begin{equation*}
+    E(T) \approx 7.52 \text{ steps}
+\end{equation*}
+Which is nearly exactly the same as the value obtained with the Markov method. Thus, the reliability of our results can now be supported, and the method used is valid.
+
+It is noteworthy that the Markov Chain method will return a more precise value, and should be favoured over the Monte Carlo, which has served its purpose as a demonstrator for the Markov method's validity. 
+
+Additionally, the Monte Carlo method is only an approximation as the values change each time it runs as it is a truly random walk simulation. However, it does still converge to around 7.52 as seen before.
+
+
+\section{Solving Problem 15 B}
+
+To address this problem we assume that \textbf{\(\Gamma\) must be an enclosed shape} - that is, one such that the spider cannot exit the confinement of the curve without first hitting the boundary of the curve itself. 
+
+We must also assume that \textbf{the curve must be placed on a discrete grid}, where each edge must be placed parallel to either of the \(x\) and \(y\) axes.
+
+\subsection{Maximising Escape Time for a Fixed Boundary Perimeter}
+
+Maximising the escape time means attempting to find a shape with the largest expected value for the spider's escape with a fixed 
+perimeter.
+
+Thus to maximise the escape time we must design the trap such that it is the farthest from the origin in all possible directions.
+Further, it is necessary to ensure all boundary parts remain at an approximately equal maximum distance from the origin. This ensures that the spider requires more steps on average to encounter any part of the boundary.
+
+A circle centred at the origin serves as an intuitive choice for such a design, but this would counter the restrictions put in place, namely, \textit{the curve must be placed on a discrete grid}. Thus on a discrete grid, a "circle" would be represented by the set of grid points that are closest to the continuous circle's boundary. This might look more like a diamond or a square depending on the grid resolution and the circle's size. 
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.2]{MC2.png}
+    \caption{Circle superimposed onto a discrete grid.}
+    \label{fig:MSRC2}
+\end{figure}
+\\
+\\
+\\
+\\
+
+\subsection{Minimising the Escape Time}
+
+To optimize the spider's escape time within a lattice grid, we consider the spatial relationship between the boundary of the trap and the spider's starting position, or origin. The foundational principle is to minimize the time it takes, on average, for the spider to reach the boundary. We explore this in detail below:
+
+\subsubsection{Distance Considerations}
+
+\begin{itemize}
+    \item \textbf{Average and Minimum Distance to Boundary:} The quickest way to ensure a reduced escape time is to minimize both the average and the minimum distances from all possible starting positions within the boundary to the boundary itself. When considering a specific starting point, such as the origin, the boundary should be as proximate as possible. This ensures that the spider frequently reaches the boundary in a shorter amount of steps, thereby reducing \(\mathbb{E}[T]\), the average escape time.
+\end{itemize}
+
+\subsubsection{Probability Considerations}
+
+\begin{itemize}
+    \item \textbf{Escape Probability for Adjacent Points:} Beyond the distance to the boundary, the spider's probability of escape when adjacent to the boundary is crucial. Ideally, the boundary's design should maximise the likelihood of the spider moving onto the boundary in its subsequent move.
+\end{itemize}
+
+\subsubsection{Geometric Implications}
+
+\begin{itemize}
+    \item \textbf{Ideal Boundary Shape:} A boundary shape that embodies the aforementioned principles would envelop the origin tightly. Given our lattice structure, a square shape encapsulating the origin is optimal. It ensures the shortest distance to the boundary from any point within.
+    
+    \item \textbf{Constraints and Modifications:} If we are operating under constraints, such as a predetermined perimeter, then the boundary might require modifications. For instance, to maintain a set perimeter, the square can have extensions or ``arms'' protruding from it. While these arms might not significantly influence the escape time from the origin, they allow us to meet the given boundary length constraint.
+\end{itemize}
+
+In summary, to minimize \(\mathbb{E}[T]\), our boundary design should focus on proximity to the origin and ensure that the spider's trajectory towards and along the boundary is as unhindered as possible.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.6]{Screenshot 2023-08-13 at 13.00.58.png}
+    \caption{A 2x2 rectangle, where the chance of escaping is 1, being most efficient with perimeter.}
+    \label{fig:MSRC3}
+\end{figure}
+
+Star shapes or cross shapes with \textit{arms} protruding towards the origin may be the first choices coming to mind. The depth and count of these protrusions can be tweaked to match the fixed boundary length while ensuring parts of the boundary remain proximal to the origin.
+\\
+\\
+\\
+\\
+\\
+\subsection{Testing Hypotheses}
+
+\subsubsection{Maximum Escape Time}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.6]{Screenshot 2023-08-13 at 1.59.45 pm.png}
+    \caption{A 4x4 rectangle, where the chance of escaping is the least.}
+    \label{fig:MSRC3}
+\end{figure}
+\begin{equation*}
+    \mathbb{E}(T) = 4.5
+\end{equation*}
+
+After 119 iterations of \(n\).
+\subsubsection{Minimum Escape Time}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.3]{Screenshot 2023-08-13 at 3.09.33 pm.png}
+    \caption{A series of squares that surround the origin.}
+    \label{fig:MSRC4}
+\end{figure}
+
+\begin{equation*}
+    \mathbb{E}(T) = 1
+\end{equation*}
+After 1 iteration of \(n\).
+
+\subsubsection{Summarising Findings}
+By testing multiple shapes with the same perimeter, our postulates have been shown true.
+
+\section{Solving Problem 15 C}
+Although investigated, were unable to come up with a viable solution for this problem in the given time frame. 
+We did find the expected values of a few shapes that intuitively seem similar for the spider to escape from geometrically distinct (i.e. shapes that have no relation by rotating or reflecting). 
+
+A square's expected value was found. Then, a bulge was created on one side of the square and an indentation of equal size on the other. The expected escape times were different and this is the extent of our scope on this question.
+
+\section{Solving Problem 15 D}
+
+To approach this problem, a new program was developed that would graph the distribution of \(n\) i.e each probability of hitting the boundary for each \(n\) steps. 
+
+Without employing more complex techniques, some basic inferences about the boundary curve can be made.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.6]{MC5.png}
+    \caption{An example distribution of the boundary from Problem 15A.}
+    \label{fig:MSRC10}
+\end{figure}
+
+
+\subsubsection{The Closest Point}
+The first \(n\) where probabilities are non-zero means that the spider took \(n\) steps to arrive at the boundary. From this, we can conclude that the first \(n\) with a non-zero probability is the distance from the origin to the closest boundary point. For example, for a given \(\Gamma\), if probabilities are non-zero starting at \(n=3\), then we know that the boundary is at least 3 units away from the origin in any straight direction.
+
+
+\subsubsection{Peak of Distribution}
+
+A sharp peak at an early iteration indicates that the spider frequently escapes the region quickly. This could mean the spider starts close to the boundary, which is further backed up by 6.0.1.
+
+\subsubsection{Spread of Distribution}
+
+A narrow distribution (with probabilities concentrated around a specific iteration) might suggest a symmetric or regular boundary shape. The spider likely has a consistent experience trying to escape, regardless of the direction it chooses.
+A wide distribution indicates variability in the spider's escape time. This could be due to irregularities or asymmetries in the boundary.
+
+\subsubsection{Multiple Peaks}
+
+    If the distribution has multiple peaks, it could hint at multiple typical escape scenarios. For instance, the spider might frequently escape quickly when heading in one direction (first peak) but take longer when heading in another direction due to a different boundary configuration (second peak).
+
+\subsubsection{Initial Probabilities}
+If a non-zero probability of escape exists at \(n=1\), this means that there is a boundary point directly reachable by moving NESW one step. This similarly repeats for \(n=2\), etc. as aforementioned in 6.0.1.
+
+\subsubsection{Skewness of Distribution}
+
+A distribution skewed to the right indicates the spider often takes longer than the average time to escape, which might suggest a larger boundary or a starting point far from the boundary.
+A distribution skewed to the left suggests the spider frequently escapes fast, meaning a small boundary.
+
+\subsubsection{Obtaining a Transition Matrix}
+Since the transition matrices involve clearly outline the points of the boundary, that is, the rows that have all 0s for their columns, obtaining the transition matrix at any point would allow us to easily determine the exact shape of the original boundary.
+
+A complicated, yet possible method of doing so, would be optimisation, and treating the difference between some arbitrary transition matrix and the probability distribution as a loss. Minimising this loss through gradient descent or another optimisation method would obtain the original matrix or something close to it. However, this is outside of the time frame of the project. 
+
+\section{Summary and References}
+
+\subsection{Summary and Conclusion}
+
+Throughout this paper, we have given a solution to Problem 15 which revolves around analysing the movement of a spider on a two-dimensional integer lattice, starting from an origin point, 
+$O$. The spider's movement is governed by random decisions, where it has an equal chance (probability of 0.25) to move in any of the four cardinal directions: up, down, left, or right. This study's essence lies in understanding the spider's escape time, symbolised as $\mathbb{E}(T)$, denoting the number of steps it takes to reach a boundary curve $\Gamma$.
+
+The spider's journey on the lattice honours the Markov property as each step relies solely on the present location and not its historical route. Representing this movement, a transition matrix can be created with the probabilities for each possible move. Importantly, when the spider reaches the boundary curve, \(\Gamma\), it can be regarded as encountering a \textit{null state}, from which it doesn't return.
+
+\textbf{Approach and Methodology:}
+We utilised a programmatic approach to solve Problem 15 A due to the computational complexities involved in manually handling the matrix.
+
+Key steps involved:
+\begin{itemize}
+    \item Creating a transition matrix, \(A\), for spider movements with boundary curves as null states.
+    \item Computation of the matrix's \(n\)-th power, \(A^n\), representing probabilities after \(n\) steps.
+    \item Iteratively summing probabilities to determine the escape likelihood until the escape probability becomes negligible.
+    \item Calculating the expected escape time, \(\mathbb{E}(T)\), using a recursive relationship.
+\end{itemize}
+
+\textbf{Results:}
+Our methodology yielded an expected escape time of \(\mathbb{E}(T) = 7.520354455020274\) steps for the given shape \(\Gamma\). This was reached after \(n = 195\) iterations and was consistent across runs. The result slightly deviates from the initial assumption of it being near the shortest path to the furthest boundary point, which is 6.
+
+\textbf{Verification and Reliability:}
+Verification using a Monte Carlo simulation produced a closely aligned result of \(E(T) \approx 7.52\) steps, thereby supporting the accuracy of our approach. Nevertheless, the Markov Chain method's precision is superior, and it should be the method of choice over the Monte Carlo, which primarily demonstrated the Markov method's reliability.
+
+\textbf{Moving Forward}
+Through reflecting upon the methodologies and outcomes of this study, it is evident that there is significant potential to expand upon this question. 
+
+\begin{enumerate}
+    \item \textbf{Advanced Computational Models:} While the Markov Chain and Monte Carlo methods have proven effective, leveraging neural networks and other machine learning models could refine our predictions, especially in more intricate lattice structures or when introducing further constraints as well as providing more efficient means of computation.
+    
+    \item \textbf{Dynamic Boundaries:} This study has treated the boundary curve, \(\Gamma\), as a static entity. We might investigate how dynamically evolving boundaries, possibly due to external factors, affect the spider's escape time.
+    
+    \item \textbf{Multi-agent Dynamics:} Introducing multiple spiders or agents, each with its movement rules, could present a fascinating multi-agent system study. Interactions between agents and competition to reach the boundary first would provide a deeper understanding of escape dynamics.
+    
+    \item \textbf{Three-Dimensional Exploration:} The current study revolves around a two-dimensional lattice. Extending the model into the third dimension might unravel intriguing dynamics, providing an even more holistic view of the spider's behaviour.
+    
+    \item \textbf{Impact of External Factors:} Introducing factors such as pheromones which might influence the spider's decision-making could provide a biologically more accurate representation and lead to unique insights into movement behaviour.
+    
+    \item \textbf{Iterative Refinements:} Our current solution to Problem 15 A is elegant and while the expected escape time has been identified for the current shape \(\Gamma\), it would be interesting to test various other geometric confines, exploring how different structures affect escape dynamics.
+    
+    \item \textbf{Boundary Shape Optimisation:} Delving deeper into the geometric shapes of boundaries to ascertain which forms yield the quickest or slowest escape times might unveil a series of optimal shapes for different scenarios.
+\end{enumerate}
+
+Our research offers an approach to understanding a spider's movement in a confined lattice space. However, there is a vast amount of further improvement and research which could be done to deepen an understanding of escape dynamics and behavioural analysis.
+
+\textbf{Solving Problem 15 B: Spider Escape Dynamics}
+Problem 15 asks us to find boundary shapes that maximise and minimise $\mathbb{E}(T)$. 
+
+\begin{itemize}
+    \item It was assumed that \(\Gamma\) is an enclosed shape on a discrete grid.
+    \item For maximizing escape time, a grid-represented circle (looking like a diamond or square) is optimal.
+    \item For minimising escape time, boundaries close to the origin, such as squares, are effective. Star or cross shapes with arms directed towards the origin can efficiently balance perimeter constraints and proximity to the origin.
+\end{itemize}
+
+\textbf{Solving Problem 15 C: Exploring Geometric Variations}
+While we were unable to find a solution to Problem 15 C, we were able to theoretically discern differing escape times from geometrically distinct shapes, such as bulges and indentations.
+
+\textbf{Solving Problem 15 D: Distribution Insights}
+Although we were unable to find a distinct solution we did note some observations:
+
+\begin{itemize}
+    \item The closest point to the origin can be identified by the first non-zero probability iteration.
+    \item Peaks in the distribution may indicate escape scenarios, while the spread can hint at boundary regularity.
+    \item The skewness of the distribution can give insights into the size and proximity of the boundary relative to the spider's starting position.
+\end{itemize}
+
+We also theorised that optimisation techniques, though complex, could potentially be used to derive the original boundary shape from a given probability distribution, though this was beyond our project's time frame.
+
+\textbf{Final Remarks:}
+
+While we have made significant progress in understanding the spider's escape dynamics and the influence of boundary configurations, 2 problems remain largely unsolved. In future investigations, it would be possible to refine our methodologies and delve deeper into these intriguing questions.
+
+\subsection{References and Links}
+
+\subsubsection{Code}
+\url{https://github.com/alislaboratory/MSRC2023}
+
+
+\begin{thebibliography}{9}
+\bibitem{video}
+Normalized Nerd (2021) \emph{Markov Chains Clearly Explained!} \url{https://www.youtube.com/watch?v=i3AkTO9HLXo&t=383s}
+\bibitem{textbook}
+S. Popov (2021) \emph{Two-Dimensional Random Walk}
+\bibitem{website}
+Wikipedia (2023) \emph{Stochastic Matrix} \url{https://en.wikipedia.org/wiki/Stochastic_matrix}
+\bibitem{website}
+Wikipedia (2023) \emph{Markov Chain} \url{https://en.wikipedia.org/wiki/Markov_chain}
+\bibitem{website}
+Wikipedia (2023) \emph{Stochastic Process} \url{https://en.wikipedia.org/wiki/Stochastic_process}
+\bibitem{website}
+Wikipedia (2023) \emph{Stochastic Process} \url{https://en.wikipedia.org/wiki/Markov_property}
+\bibitem{website}
+Wikipedia (2023) \emph{Discrete-time Markov Chain} \url{https://en.wikipedia.org/wiki/Discrete-time_Markov_chain}
+\bibitem{textbook}
+Spitzer, F. (1976). Principles of Random Walk, Springer-Verlag.
+\bibitem{textbook}
+K. Pearson (1905) \emph{The Problem of the Random Walk}
+\bibitem{textbook}
+K. L. Chung (1975) \emph{Elementary Probability Theory with Stochastic Processes}
+\end{thebibliography}
+
+\end{document}

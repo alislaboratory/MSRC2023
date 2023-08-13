@@ -3,7 +3,7 @@
 # 13 Aug 2023
 
 ### This code is the Monte Carlo/simulated approach to random walks. Our paper can be found at the GitHub:
-# TODO
+# https://github.com/alislaboratory/MSRC2023
 
 
 
@@ -12,9 +12,6 @@ import random
 
 
 def monte_carlo_simulation(start, gamma, trials=1000000):
-    """
-    Use the Monte Carlo method to estimate the expected escape time.
-    """
     total_steps = 0
 
     for _ in range(trials):

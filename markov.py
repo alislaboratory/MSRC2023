@@ -1,9 +1,9 @@
 ### WRITTEN BY ALI ASHRAFY 2023
 ### MATHEMATICS AND STATISTICS RESEARCH COMPETITION
-
+# 13 Aug 2023
 
 ### This code is the Markov Chain approach to random walks. Our paper can be found at the GitHub:
-# Insert
+# https://github.com/alislaboratory/MSRC2023
 
 import numpy as np
 from pprint import pprint
@@ -234,4 +234,4 @@ while True:  # Expected value is sum of n x P(escape time = n) to n = infinity
 
 
 print(summ)
-plot_distribution(n_distribution=n_distribution)
+plot_distribution(n_distribution=n_distribution) # Plot distribution (comment out if not working on Problem D as it will cause trouble)
